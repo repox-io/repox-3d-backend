@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- viewer back to middleware -->
+  <RegistrationRequest>
+    <ProviderID>repox.io</ProviderID>
+    <SessionToken>eyJ0eXAiOi...</SessionToken>
+    <BackEnd>
+      <Access-Control-Allow-Origin>*</Access-Control-Allow-Origin> <!-- for CORS. The wildcard * can be used -->
+      <SupportedOptions>
+        <Architecture value="REST"> <!-- possible values: REST, WASM -->
+          <Access-Control-Allow-Method>GET</Access-Control-Allow-Method> <!-- exposed supported methods. The wildcard * can be used. Used only for REST architecture -->
+          <Access-Control-Allow-Method>POST</Access-Control-Allow-Method>
+          <Access-Control-Allow-Method>PUT</Access-Control-Allow-Method>
+          <Access-Control-Allow-Method>DELETE</Access-Control-Allow-Method>
+        </Architecture>
+        <Analytics>
+          <UsageTracking enabled="True" />
+          <PerformanceMetrics>
+            <Metric name="RenderTime" />
+            <Metric name="LoadTime" />
+            <Metric name="MemoryUsage" />
+          </PerformanceMetrics>
+        </Analytics>
+        <MetadataRet> <!-- Metadata Retrieval (Vangelis) -->
+          <!-- Mandatory -->
+          <MetadataElement name="rdf:resource" type="String" readonly="True" />
+          <MetadataElement name="edm:type" type="URI" readonly="True" />
+          <MetadataElement name="edm:aggregatedCHO" type="String" readonly="True" />
+          <MetadataElement name="edm:dataProvider" type="String" readonly="True" />
+          <MetadataElement name="edm:provider" type="String" readonly="True" />
+          <MetadataElement name="edm:rights" type="URI" readonly="True" />
+          <MetadataElement name="dc:language" type="URI" readonly="True" />
+          <MetadataElement name="dc:subject" type="String" readonly="True" />
+
+          <!-- Conditional (at least one out of two is required for each group)-->
+          <MetadataElement name="dcterms:spatial" type="String" readonly="True" />
+          <MetadataElement name="dcterms:temporal" type="Date" readonly="True" />
+
+          <MetadataElement name="dc:title" type="String" readonly="True" />
+          <MetadataElement name="dc:description" type="String" readonly="True" />
+
+          <MetadataElement name="edm:isShownAt" type="URI" readonly="True" />
+          <MetadataElement name="edm:isShownBy" type="URI" readonly="True" />
+
+          <!-- Non Mandatory -->
+          <!-- identity -->
+          <MetadataElement name="dc:identifier" type="String" readonly="True" />
+          <MetadataElement name="dc:creator" type="String" readonly="True" />
+          <MetadataElement name="dcterms:created" type="date" readonly="True" />
+          <MetadataElement name="dc:contributor" type="String" readonly="True" />
+          <MetadataElement name="dc:publisher" type="String" readonly="True" />
+
+          <!-- Creation Context -->
+          <MetadataElement name="creationProcess" type="String" readonly="True" />
+          <MetadataElement name="creationDescription" type="String" readonly="True" />
+          <MetadataElement name="dc:provenance" type="String" readonly="True" />
+
+          <!-- Relationships -->
+          <MetadataElement name="dc:source" type="URI" readonly="True" />
+          <MetadataElement name="dc:relation" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:isPartOf" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:hasPart" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:isFormatOf" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:isReferencedBy" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:isReplacedBy" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:isRequiredBy" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:isVersionOf" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:replaces" type="String" readonly="True" />
+          <MetadataElement name="dcterms:requires" type="String" readonly="True" />
+          <MetadataElement name="dcterms:hasPart" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:hasVersion" type="String" readonly="True" />
+          <MetadataElement name="edm:isRelatedTo" type="URI" readonly="True" />
+          <MetadataElement name="edm:isRepresentationOf" type="URI" readonly="True" />
+          <MetadataElement name="edm:isSimilarTo" type="URI" readonly="True" />
+          <MetadataElement name="edm:isSuccessorOf" type="URI" readonly="True" />
+          <MetadataElement name="edm:incorporates" type="String" readonly="True" />
+          <MetadataElement name="edm:isDerivativeOf" type="String" readonly="True" />
+          <MetadataElement name="edm:IsNextInSequence" type="Integer" readonly="True" />
+
+          <!-- Media / Format -->
+          <MetadataElement name="dc:format" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:hasFormat" type="String" readonly="True" />
+          <MetadataElement name="edm:hasType" type="String" readonly="True" />
+          <MetadataElement name="isDownloadable" type="Boolean" readonly="True" />
+          <MetadataElement name="dc:accessRights" type="String" readonly="True" />
+
+          <!-- Location / Time -->
+          <MetadataElement name="dc:date" type="Date" readonly="True" />
+          <MetadataElement name="edm:currentLocation" type="String" readonly="True" />
+          <MetadataElement name="periods" type="String" readonly="True" />
+
+          <!-- Technical -->
+          <MetadataElement name="faceCount" type="Integer" readonly="True" />
+          <MetadataElement name="vertexCount" type="Integer" readonly="True" />
+          <MetadataElement name="textureCount" type="Integer" readonly="True" />
+          <MetadataElement name="materialCount" type="Integer" readonly="True" />
+          <MetadataElement name="polygonType" type="String" readonly="True" />
+          <MetadataElement name="dimension" type="String" readonly="True" />
+          <MetadataElement name="units" type="String" readonly="True" />
+
+          <!-- Other -->
+          <MetadataElement name="dcterms:alternative" type="String" readonly="True" />
+          <MetadataElement name="dcterms:conformsTo" type="URI" readonly="True" />
+          <MetadataElement name="dcterms:extent" type="Integer" readonly="True" />
+          <MetadataElement name="dcterms:issued" type="Date" readonly="True" />
+          <MetadataElement name="dcterms:medium" type="String" readonly="True" />
+          <MetadataElement name="dcterms:provenance" type="String" readonly="True" />
+          <MetadataElement name="dcterms:references" type="String" readonly="True" />
+          <MetadataElement name="dcterms:tableOfContents" type="String" readonly="True" />
+          <MetadataElement name="edm:hasMet" type="String" readonly="True" />
+          <MetadataElement name="edm:realizes" type="String" readonly="True" />
+          <MetadataElement name="owl:sameAs" type="String" readonly="True" />
+          <MetadataElement name="edm:hasView" type="Boolean" readonly="True" />
+          <MetadataElement name="edm:preview" type="String" readonly="True" />
+          <MetadataElement name="edm:object" type="String" readonly="True" />
+          <MetadataElement name="edm:intermediateProvider" type="String" readonly="True" />
+          <MetadataElement name="edm:ugc" type="String" readonly="True" />
+        </MetadataRet>
+        <ProgressiveLoading value="True" />
+        <TimeMachine value="True" />
+        <FileFormats> <!-- Supported File Formats -->
+          <Format extension=".obj" mimetype="model/obj" native="False" /> <!-- "native" means if the format is supported without previous conversions -->
+          <Format extension=".bin" mimetype="application/octet-stream" native="False" />
+          <Format extension=".ifc" mimetype="application/x-extension-ifc" native="False" />
+          <Format extension=".ifz" mimetype="application/x-extension-ifczip" native="False" />
+          <Format extension=".ifcxml" mimetype="application/x-extension-ifcxml" native="False" />
+          <Format extension=".ttl" mimetype="text/plain" native="True" />
+          <Format extension=".json" mimetype="application/json" native="True" />
+          <Format extension=".dae" mimetype="model/vnd.collada+xml" native="True" />
+          <Format extensione=".las" mimetype="application/vnd.las" native="False" />
+          <Format extensione=".laz" mimetype="application/vnd.laszip" native="False" />
+          <Format extensione=".e57" mimetype="model/e57" native="False" />
+          <Format extensione=".dxf" mimetype="image/vnd.dxf" native="False" />
+          <Format extensione=".stl" mimetype="model/stl" native="False" />
+          <Format extensione=".igs" mimetype="model/iges" native="False" />
+          <Format extensione=".wrl" mimetype="model/vrml" native="False" />
+          <Format extensione=".usda" mimetype="model/vnd.usda" native="False" />
+          <Format extensione=".usdz" mimetype="model/vnd.usdz+zip" native="False" />
+          <Format extensione=".x3d" mimetype="model/x3d+xml" native="False" />
+          <Format extensione=".x3db" mimetype="model/x3d+fastinfoset" native="False" />
+          <Format extensione=".x3dv" mimetype="model/x3d-vrml" native="False" />
+          <Format extensione=".gltf" mimetype="model/gltf+json" native="False" />
+          <Format extensione=".glb" mimetype="model/gltf-binary" native="False" />
+
+          <Format extensione=".stp" mimetype="model/step" native="False" />
+          <Format extensione=".stp" mimetype="model/step+xml" native="False" />
+          <Format extensione=".stp" mimetype="model/step+zip" native="False" />
+
+          <!-- No official IANA; using Common/De facto from 3D-4CH D3.1 (Annex 3) -->
+          <Format extensione=".xyz" mimetype="text/plain" native="False" />
+          <Format extensione=".pts" mimetype="text/plain" native="False" />
+          <Format extensione=".ptx" mimetype="text/plain" native="False" />
+          <Format extensione=".fbx" mimetype="application/octet-stream" native="False" />
+          <Format extensione=".ply" mimetype="application/octet-stream" native="False" />
+          <Format extensione=".usd" mimetype="application/octet-stream" native="False" />
+          <Format extensione=".usdc" mimetype="application/octet-stream" native="False" />
+
+        </FileFormats>
+        <DataProviders>
+          <CloudStorages> <!-- Cloud Storages -->
+            <Storage name="AWS S3" storage-size="1024" /> <!-- in MBs -->
+            <Storage name="GitHub" storage-size="0" /> <!-- 0 means infinite -->
+          </CloudStorages>
+          <Databases>
+            <Database name="SQLServer" type="SQL" language="T-SQL" db-size="1024" endpoint="xxx.xxx.xxx.xxx" tcp-port="1433" public="False" /> <!-- in MBs -->
+            <Database name="MariaDB" type="SQL" language="SQL" db-size="1024" endpoint="xxx.xxx.xxx.xxx" tcp-port="3306" public="False" />
+            <Database name="PostgreSQL" type="SQL" language="SQL" db-size="1024" endpoint="xxx.xxx.xxx.xxx" tcp-port="5432" public="True" />
+            <Database name="Fuseki" type="RDF" language="SPARQL" db-size="1024" endpoint="xxx.xxx.xxx.xxx" tcp-port="3030" public="True" />
+          </Databases>
+        </DataProviders>
+        <FullText> <!-- supported Full-text search engines -->
+          <Search name="ElasticSearch" />
+          <Search name="OpenSearch" />
+        </FullText>
+        <Protocols>
+          <Protocol value="oEmbed" />
+        </Protocols>
+        <Authentication> <!-- Authentication Protocols -->
+          <Protocol name="oAuth" />
+          <Protocol name="APIKey" />
+        </Authentication>
+      </SupportedOptions>
+    </BackEnd>
+    <FrontEnd>
+      <GUI>
+        <ViewType value="True" /> <!-- type of viewer gui mask, 'light' or 'full', default is 'light' (Rene (Arctur)) -->
+        <Languages>
+          <Language default="True">en-US</Language> <!-- language code ISO 639-1 (example: 'en', 'sl', ...), default is 'en' (Rene (Arctur)) + ISO 3166-1 alpha-2 country code (UK, US, IT, ES)-->
+          <Language>en-UK</Language>
+          <Language>it-IT</Language>
+          <Language>es-ES</Language>
+        </Languages>
+        <MobileOptimization value="True" />
+        <MaxPolygonCount>1000000</MaxPolygonCount>
+        <MaxTextureSize>4096</MaxTextureSize>
+      </GUI>
+      <SupportedOptions>
+        <Scene> <!-- Scene Setup and Update -->
+          <Autoload value="True" /> <!-- autoload asset on initialization, default is false (Rene (Arctur)) -->
+          <Zoom value="True" />
+          <Pan value="True" />
+          <BackgroundColor value="000,FFF,DD2500,ALL" default="000" /> <!-- RGB -->
+          <View value="Top,Bottom,Front,Back,Left,Right" default="Front" />
+          <Lights value="True" /> <!-- changing lights is allowed or not -->
+          <VR value="True" /> <!-- supports for Virtual Reality -->
+        </Scene>
+        <MultipleModels>
+          <Format extension=".obj" mimetype="text/plain" />
+          <Format extension=".bin" mimetype="application/octet-stream" />
+          <Format extension=".ifc" mimetype="application/x-extension-ifc" />
+          <Format extension=".ifz" mimetype="application/x-extension-ifczip" />
+          <Format extension=".ifcxml" mimetype="application/x-extension-ifcxml" />
+          <Format extension=".stp" mimetype="application/x-extension-ap242" />
+          <Format extension=".step" mimetype="application/x-extension-ap242" />
+          <Format extension=".ttl" mimetype="text/plain" />
+          <Format extension=".json" mimetype="application/json" />
+          <Format extension=".dae" mimetype="model/vnd.collada+xml" />
+       </MultipleModels>
+       <ElementSelection value="multiple"> <!-- none, single, multiple -->
+          <Color value="00FF00" />
+          <Color value="0000FF" default="True" />
+       </ElementSelection>
+       <Elements> <!-- Supported Elements -->
+          <Element name="Product" type="IfcProduct" />
+          <Element name="Annotation" type="IfcAnnotation" />
+          <Element name="Element" type="IfcElement" />
+          <Element name="Built Element" type="IfcBuiltElement" />
+          <Element name="Beam" type="IfcBeam" />
+          <Element name="Bearing" type="IfcBearing" />
+          <Element name="Building Element Proxy" type="IfcBuildingElementProxy" />
+          <Element name="Chimney" type="IfcChimney" />
+          <Element name="Column" type="IfcColumn" />
+          <Element name="Course" type="IfcCourse" />
+          <Element name="Covering" type="IfcCovering" />
+          <Element name="Curtain Wall" type="IfcCurtainWall" />
+          <Element name="Deep Foundation" type="IfcDeepFoundation" />
+          <Element name="Caisson Foundation" type="IfcCaissonFoundation" />
+          <Element name="Pile" type="IfcPile" />
+          <Element name="Door" type="IfcDoor" />
+          <Element name="Earthworks Element" type="IfcEarthworksElement" />
+          <Element name="Earthworks Fill" type="IfcEarthworksFill" />
+          <Element name="Reinforced Soil" type="IfcReinforcedSoil" />
+          <Element name="Footing" type="IfcFooting" />
+          <Element name="Kerb" type="IfcKerb" />
+          <Element name="Member" type="IfcMember" />
+          <Element name="Mooring Device" type="IfcMooringDevice" />
+          <Element name="Navigation Element" type="IfcNavigationElement" />
+          <Element name="Pavement" type="IfcPavement" />
+          <Element name="Plate" type="IfcPlate" />
+          <Element name="Rail" type="IfcRail" />
+          <Element name="Railing" type="IfcRailing" />
+          <Element name="Ramp" type="IfcRamp" />
+          <Element name="Ramp Flight" type="IfcRampFlight" />
+          <Element name="Roof" type="IfcRoof" />
+          <Element name="Shading Device" type="IfcShadingDevice" />
+          <Element name="Slab" type="IfcSlab" />
+          <Element name="Stair" type="IfcStair" />
+          <Element name="Stair Flight" type="IfcStairFlight" />
+          <Element name="Track Element" type="IfcTrackElement" />
+          <Element name="Wall" type="IfcWall" />
+          <Element name="Wall Standard Case" type="IfcWallStandardCase" />
+          <Element name="Window" type="IfcWindow" />
+          <Element name="Civil Element" type="IfcCivilElement" />
+          <Element name="Distribution Element" type="IfcDistributionElement" />
+          <Element name="Distribution Control Element" type="IfcDistributionControlElement" />
+          <Element name="Actuator" type="IfcActuator" />
+          <Element name="Alarm" type="IfcAlarm" />
+          <Element name="Controller" type="IfcController" />
+          <Element name="Flow Instrument" type="IfcFlowInstrument" />
+          <Element name="Protective Device TrippingUnit" type="IfcProtectiveDeviceTrippingUnit" />
+          <Element name="Sensor" type="IfcSensor" />
+          <Element name="Unitary Control Element" type="IfcUnitaryControlElement" />
+          <Element name="Distribution Flow Element" type="IfcDistributionFlowElement" />
+          <Element name="Distribution Chamber Element" type="IfcDistributionChamberElement" />
+          <Element name="Energy Conversion Device" type="IfcEnergyConversionDevice" />
+          <Element name="Flow Controller" type="IfcFlowController" />
+          <Element name="Flow Fitting" type="IfcFlowFitting" />
+          <Element name="Flow Moving Device" type="IfcFlowMovingDevice" />
+          <Element name="Flow Segment" type="IfcFlowSegment" />
+          <Element name="Flow Storage Device" type="IfcFlowStorageDevice" />
+          <Element name="Flow Terminal" type="IfcFlowTerminal" />
+          <Element name="Flow Treatment Device" type="IfcFlowTreatmentDevice" />
+          <Element name="Element Assembly" type="IfcElementAssembly" />
+          <Element name="Element Component" type="IfcElementComponent" />
+          <Element name="Building Element Part" type="IfcBuildingElementPart" />
+          <Element name="Discrete Accessory" type="IfcDiscreteAccessory" />
+          <Element name="Fastener" type="IfcFastener" />
+          <Element name="Impact Protection Device" type="IfcImpactProtectionDevice" />
+          <Element name="Mechanical Fastener" type="IfcMechanicalFastener" />
+          <Element name="Reinforcing Element" type="IfcReinforcingElement" />
+          <Element name="Sign" type="IfcSign" />
+          <Element name="Vibration Damper" type="IfcVibrationDamper" />
+          <Element name="Vibration Isolator" type="IfcVibrationIsolator" />
+          <Element name="Feature Element" type="IfcFeatureElement" />
+          <Element name="Feature Element Addition" type="IfcFeatureElementAddition" />
+          <Element name="Feature Element Subtraction" type="IfcFeatureElementSubtraction" />
+          <Element name="Surface Feature" type="IfcSurfaceFeature" />
+          <Element name="Furnishing Element " type="IfcFurnishingElement" />
+          <Element name="Furniture" type="IfcFurniture" />
+          <Element name="System Furniture Element" type="IfcSystemFurnitureElement" />
+          <Element name="Geographic Element" type="IfcGeographicElement" />
+          <Element name="Geotechnical Element" type="IfcGeotechnicalElement" />
+          <Element name="Geotechnical Assembly" type="IfcGeotechnicalAssembly" />
+          <Element name="Borehole" type="IfcBorehole" />
+          <Element name="Geomodel" type="IfcGeomodel" />
+          <Element name="Geoslice" type="IfcGeoslice" />
+          <Element name="Geotechnical Stratum" type="IfcGeotechnicalStratum" />
+          <Element name="Transportation Device" type="IfcTransportationDevice" />
+          <Element name="Transport Element" type="IfcTransportElement" />
+          <Element name="Vehicle" type="IfcVehicle" />
+          <Element name="Virtual Element" type="IfcVirtualElement" />
+          <Element name="Linear Element" type="IfcLinearElement" />
+          <Element name="Alignment Cant" type="IfcAlignmentCant" />
+          <Element name="Alignment Horizontal" type="IfcAlignmentHorizontal" />
+          <Element name="Alignment Segment" type="IfcAlignmentSegment" />
+          <Element name="Alignment Vertical" type="IfcAlignmentVertical" />
+          <Element name="Port" type="IfcPort" />
+          <Element name="Distribution Port" type="IfcDistributionPort" />
+          <Element name="Positioning Element" type="IfcPositioningElement" />
+          <Element name="Grid" type="IfcGrid" />
+          <Element name="Linear Positioning Element" type="IfcLinearPositioningElement" />
+          <Element name="Referent" type="IfcReferent" />
+          <Element name="Spatial Element" type="IfcSpatialElement" />
+          <Element name="External Spatial Structure Element" type="IfcExternalSpatialStructureElement" />
+          <Element name="Spatial Structure Element" type="IfcSpatialStructureElement" />
+          <Element name="Spatial Zone" type="IfcSpatialZone" />
+          <Element name="Structural Activity" type="IfcStructuralActivity" />
+          <Element name="Structural Action" type="IfcStructuralAction" />
+          <Element name="Structural Reaction" type="IfcStructuralReaction" />
+          <Element name="Structural Item" type="IfcStructuralItem" />
+          <Element name="Structural Connection" type="IfcStructuralConnection" />
+          <Element name="Structural Curve Connection" type="IfcStructuralCurveConnection" />
+          <Element name="Structural Point Connection" type="IfcStructuralPointConnection" />
+          <Element name="Structural Surface Connection" type="IfcStructuralSurfaceConnection" />
+          <Element name="Structural Member" type="IfcStructuralMember" />
+          <Element name="Structural Curve Member" type="IfcStructuralCurveMember" />
+          <Element name="Structural Surface Member" type="IfcStructuralSurfaceMember" />
+       </Elements>
+       <Measuring> <!-- Measuring Tools (Rene (Arctur)) -->
+         <Tool name="Distance" unit="m" precision="0.00" />
+         <Tool name="Height" unit="cm" precision="0.0" />
+         <Tool name="Angle" unit="rad" precision="0.0" />
+         <Tool name="Area" unit="sqm" precision="0.00" />
+       </Measuring>
+       <Attachments>
+         <Format extension=".jpg" mimetype="image/jpeg" />
+         <Format extension=".jpeg" mimetype="image/jpeg" />
+         <Format extension=".png" mimetype="image/png" />
+         <Format extension=".bmp" mimetype="image/bmp" />
+         <Format extension=".pdf" mimetype="application/pdf" />
+       </Attachments>
+       <CustomBBox value="True" />
+      </SupportedOptions>
+    </FrontEnd>
+    <Timestamp>2025-05-20T14:00:00Z</Timestamp>
+  </RegistrationRequest>

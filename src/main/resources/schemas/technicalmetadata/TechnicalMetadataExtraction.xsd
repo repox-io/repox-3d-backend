@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <!-- Request and response live in one file: they share ServiceID/SessionToken/Timestamp, which
+         cannot be declared as globals twice within the same xjc source folder. Shared elements are
+         therefore declared locally inside each root's complexType. -->
+
+    <xs:element name="TechnicalMetadataExtractionRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ServiceID" type="xs:integer"/>
+                <xs:element name="SessionToken" type="xs:string"/>
+                <xs:element name="Source" type="SourceType"/>
+                <xs:element name="Timestamp" type="xs:dateTime" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="SourceType">
+        <xs:choice>
+            <xs:element name="LocalSource" type="LocalSourceType"/>
+            <xs:element name="UrlSource" type="UrlSourceType"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <!-- Base64 model bytes as element text, metadata as attributes: the conversion.xml convention
+         from https://github.com/xrculture/protocol -->
+    <xs:complexType name="LocalSourceType">
+        <xs:simpleContent>
+            <xs:extension base="xs:base64Binary">
+                <xs:attribute name="filename" type="xs:string"/>
+                <xs:attribute name="extension" type="xs:string"/>
+                <xs:attribute name="dimension" type="xs:long"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="UrlSourceType">
+        <xs:sequence>
+            <xs:element name="FileExtension" type="xs:string" minOccurs="0"/>
+            <xs:element name="FileDimension" type="xs:long" minOccurs="0"/>
+            <xs:element name="Url" type="xs:anyURI"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="TechnicalMetadataExtractionResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ServiceID" type="xs:integer" minOccurs="0"/>
+                <xs:element name="SessionToken" type="xs:string" minOccurs="0"/>
+                <xs:element name="Status" type="xs:integer"/>
+                <!-- xs:string, deliberately not xs:NCName: the message contains spaces -->
+                <xs:element name="Message" type="xs:string"/>
+                <xs:element name="TechnicalMetadataExtractionResult"
+                            type="TechnicalMetadataExtractionResultType" minOccurs="0"/>
+                <xs:element name="Timestamp" type="xs:dateTime"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Every metric is optional: only non-null, non-zero values are emitted, which makes the
+         element set itself describe the model type (mesh counts vs gaussian splat counts). -->
+    <xs:complexType name="TechnicalMetadataExtractionResultType">
+        <xs:sequence>
+            <xs:element name="MemoryConsumptionBytes" type="xs:long" minOccurs="0"/>
+            <xs:element name="Nodes" type="xs:long" minOccurs="0"/>
+            <xs:element name="Meshes" type="xs:long" minOccurs="0"/>
+            <xs:element name="Animations" type="xs:long" minOccurs="0"/>
+            <xs:element name="Textures" type="xs:long" minOccurs="0"/>
+            <xs:element name="Materials" type="xs:long" minOccurs="0"/>
+            <xs:element name="Cameras" type="xs:long" minOccurs="0"/>
+            <xs:element name="Lights" type="xs:long" minOccurs="0"/>
+            <xs:element name="Vertices" type="xs:long" minOccurs="0"/>
+            <xs:element name="Faces" type="xs:long" minOccurs="0"/>
+            <xs:element name="Bones" type="xs:long" minOccurs="0"/>
+            <xs:element name="AnimationChannels" type="xs:long" minOccurs="0"/>
+            <xs:element name="PointCount" type="xs:long" minOccurs="0"/>
+            <xs:element name="GaussianCount" type="xs:long" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,148 @@
+# ============================================================================
+# Stable "processing arsenal" base image for repox-3d-api.
+#
+# Contains the slow-changing toolchain (Blender, assimp, gltfpack, GaussForge,
+# TripoSR + Python + model weights, rembg) so the application Dockerfile only
+# has to compile the jar and layer it on top. Rebuild/push this ONLY when the
+# toolchain changes; bump the tag and update ARG BASE_IMAGE in Dockerfile.
+#
+#   docker build -f Dockerfile.3dbase -t <registry>/<namespace>/repox-3d-base:1.0.0 .
+#   docker push <registry>/<namespace>/repox-3d-base:1.0.0
+# ============================================================================
+
+# ---------- TripoSR (adapted from official, CPU only) ----------
+FROM python:3.10-slim AS triposr
+ARG DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        git \
+        libgl1 \
+        libglib2.0-0 \
+        libsm6 \
+        libxext6 \
+        libxrender1 \
+        libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip setuptools ninja
+RUN pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cpu
+WORKDIR /triposr
+# Pin TRIPOSR_REF to a commit/tag for reproducible base rebuilds (defaults to latest main).
+ARG TRIPOSR_REF=main
+RUN git clone https://github.com/VAST-AI-Research/TripoSR . \
+    && git checkout ${TRIPOSR_REF}
+RUN pip install -r requirements.txt
+RUN pip install onnxruntime rembg
+# Pre-bake TripoSR model weights
+RUN python -c "from tsr.system import TSR; TSR.from_pretrained('stabilityai/TripoSR', 'config.yaml', 'model.ckpt')"
+# Pre-bake rembg u2net model
+RUN python -c "import rembg; rembg.new_session()"
+
+# ---------- GaussForge (gfconvert) build ----------
+# Built from source because there is no prebuilt Linux binary. Needs CMake >= 3.26, so we use Ubuntu
+# 24.04 (jammy's cmake is too old). Pin GAUSSFORGE_REF to a tag/commit once the project cuts releases.
+FROM ubuntu:24.04 AS gfconvert-build
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        ca-certificates \
+        build-essential \
+        cmake \
+        ninja-build \
+        zlib1g-dev \
+        libwebp-dev \
+    && rm -rf /var/lib/apt/lists/*
+ARG GAUSSFORGE_REF=main
+RUN git clone --depth 1 --branch ${GAUSSFORGE_REF} https://github.com/3dgscloud/GaussForge.git /src
+WORKDIR /src/build
+# GaussForge defines no install() rule for the gfconvert CLI (only the ply_to_spz/spz_to_ply/spz_info
+# helpers), so `cmake --install` does not place it under the prefix. The CLI is built at the build-tree
+# root (/src/build/gfconvert); the runtime stage copies it directly from there.
+RUN cmake -DCMAKE_BUILD_TYPE=Release .. \
+    && cmake --build . --config Release \
+    && cmake --install . --prefix /opt/gfconvert
+
+# ---------- Base runtime arsenal ----------
+FROM eclipse-temurin:21-jre-noble AS base
+
+# Blender is installed from the official tarball (see below) — Ubuntu jammy's apt
+# Blender is far too old for the 4.x import APIs (wm.obj_import / wm.stl_import /
+# wm.ply_import) used by the toolkit Python scripts.
+ARG BLENDER_SERIES=4.1
+ARG BLENDER_VERSION=4.1.1
+
+# Install assimp CLI, headless display server (xvfb), download tooling, and the
+# system libraries the Blender tarball needs to run headless.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        assimp-utils \
+        xvfb \
+        wget \
+        unzip \
+        xz-utils \
+        ca-certificates \
+        libwebp7 \
+        libgl1 \
+        libglib2.0-0 \
+        libegl1 \
+        libgl1-mesa-dri \
+        libsm6 \
+        libice6 \
+        libx11-6 \
+        libxext6 \
+        libxi6 \
+        libxxf86vm1 \
+        libxfixes3 \
+        libxrender1 \
+        libxkbcommon0 \
+        libstdc++6 \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Blender 4.x from the official tarball into /opt/blender and put it on PATH.
+# Assumes linux x64; adjust the URL for arm64 if deploying on ARM.
+RUN wget -q "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" -O /tmp/blender.tar.xz \
+    && mkdir -p /opt/blender \
+    && tar -xJf /tmp/blender.tar.xz -C /opt/blender --strip-components=1 \
+    && rm /tmp/blender.tar.xz
+ENV PATH="/opt/blender:${PATH}"
+
+# Install gltfpack (meshoptimizer) prebuilt native binary for glTF/GLB mesh compression.
+ARG GLTFPACK_VERSION=0.22
+RUN wget -q "https://github.com/zeux/meshoptimizer/releases/download/v${GLTFPACK_VERSION}/gltfpack-ubuntu.zip" -O /tmp/gltfpack.zip \
+    && unzip -o /tmp/gltfpack.zip -d /usr/local/bin \
+    && chmod +x /usr/local/bin/gltfpack \
+    && rm /tmp/gltfpack.zip
+
+# Install gfconvert (GaussForge) from the build stage for Gaussian-splat conversion.
+COPY --from=gfconvert-build /src/build/gfconvert /usr/local/bin/gfconvert
+
+# Copy TripoSR + Python 3.10 runtime from triposr stage
+COPY --from=triposr /triposr /triposr
+COPY --from=triposr /usr/local/lib/python3.10 /usr/local/lib/python3.10
+COPY --from=triposr /usr/local/lib/libpython3.10.so.1.0 /usr/local/lib/libpython3.10.so.1.0
+COPY --from=triposr /usr/local/bin/python3.10 /usr/local/bin/python3.10
+COPY --from=triposr /usr/local/bin/pip /usr/local/bin/pip
+RUN ldconfig
+
+# Create non-root user with home directory and copy HF weights cache into it
+RUN useradd -r -u 10001 -g root -m -d /home/appuser appuser
+COPY --from=triposr /root/.cache/huggingface /home/appuser/.cache/huggingface
+COPY --from=triposr /root/.u2net /home/appuser/.u2net
+
+# Prepare the app working dir + toolkit I/O dirs (the jar is added by the application Dockerfile).
+RUN mkdir -p /app /input /output /tmp/numba_cache && \
+    chown -R appuser:root /app /input /output /triposr /tmp/numba_cache /home/appuser /home/appuser/.u2net && \
+    chmod 777 /tmp/numba_cache
+WORKDIR /app
+
+ENV TRIPOSR_DIR=/triposr \
+    TRIPOSR_DEVICE=cpu \
+    TRIPOSR_SAVE_FORMAT=glb \
+    TRIPOSR_PYTHON=/usr/local/bin/python3.10 \
+    PYTHONUNBUFFERED=1 \
+    HF_HUB_OFFLINE=1 \
+    TRANSFORMERS_OFFLINE=1 \
+    NUMBA_CACHE_DIR=/tmp/numba_cache

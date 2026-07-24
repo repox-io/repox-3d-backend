@@ -1,0 +1,165 @@
+logging:
+  level:
+    ROOT: INFO
+server:
+  port: ${API_PORT:}
+  servlet:
+    context-path: "${CONTEXT_PATH:/}"
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types: image/svg+xml,image/jpeg,image/png,font/woff2,text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+  error:
+    include-exception: false
+    include-binding-errors: never
+    include-message: never
+    include-stacktrace: never
+    whitelabel:
+      enabled: true
+    path: "/error"
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "info,health"
+      security:
+        enabled: true
+        username: "${ACTUATOR_USERNAME}"
+        password: "${ACTUATOR_PASSWORD}"
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+spring:
+  application:
+    name: "@project.name@"
+    version: "@project.version@"
+  banner:
+    location: classpath:banner.txt
+  profiles:
+    group:
+      local:
+      it:
+      dev:
+      production:
+    active: ${SPRING_PROFILE:local}
+  docker:
+    compose:
+      enabled: false # only enabled in local development
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1GB
+      max-request-size: 2GB
+  threads:
+    virtual:
+      enabled: true
+  flyway:
+    enabled: true
+    default-schema: "public"
+    locations: "classpath:db/migration"
+    fail-on-missing-locations: true
+    schemas:
+      - "public"
+  sql:
+    init:
+      mode: never
+  datasource:
+    url: "jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_CATALOG}?reWriteBatchedInserts=true"
+    username: "${DB_USERNAME}"
+    password: "${DB_PASSWORD}"
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 40
+      idle-timeout: 60000
+      pool-name: "repox-3d-api-db-connection-pool"
+      auto-commit: false #default true. When set to false a new connection from the database will have autocommit setting off by default (the default setting is on when you go and get a new connection from jdbc driver)
+      data-source-properties:
+        prepareThreshold: 5 #default is 5. Alternative: 3-10 depending on query repetition patterns. Lowering this value can lead to faster adoption of server-side prepared statements for frequently used queries, while increasing it may be beneficial for queries that are less frequently repeated.
+        preparedStatementCacheQueries: 500 # default is 256. Alternative: 500-1000 for applications with many unique queries. Increasing this value can improve performance for applications that use a large number of different prepared statements.
+        preparedStatementCacheSizeMiB: 10 # default is 5. Alternative: 10-20 MiB for applications with complex queries. A larger cache size allows for more prepared statements to be stored, potentially improving performance for complex query workloads.
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        id:
+          sequence:
+            increment_size_mismatch_strategy: EXCEPTION #Default Exception. determines how Hibernate handles a mismatch between the increment_size configured in the entity mapping and the actual allocation size used by the database sequence
+          optimizer:
+            pooled:
+              preferred: "pooled-lo" #This setting controls the preferred optimizer strategy when using pooled identifier generators with a database sequence.
+              # Uses a hi-lo algorithm, where Hibernate fetches a high value from the sequence and generates IDs sequentially within a block (e.g., if the database sequence increments by 50, Hibernate assigns IDs 1-50, then 51-100, etc.)
+        connection:
+          provider_disables_autocommit: true # default false. This setting determines whether Hibernate automatically disables autocommit when interacting with the database. We have explicitly disabled autocommit on hikari
+        generate_statistics: false
+        order_inserts: true # default false. When enabled (true), groups INSERT statements by entity type and executes them in batches
+        order_updates: true # default false. When set to true, Hibernate orders updates by entity type to improve batching efficiency
+        query:
+          in_clause_parameter_padding: true # default true (hibernate 5.3). When enabled (true), Hibernate ensures that the number of parameters in an IN clause is always a multiple of the database’s preferred batch size. This prevents query plan cache fragmentation.
+          plan_cache_max_size: 4096 #default 2048. This setting controls the maximum number of query plan caches Hibernate maintains. If a query plan is already in the cache, Hibernate reuses it; otherwise, a new one is created
+          plan_cache_parameter_metadata_max_size: 512 #default 128. Every time Hibernate executes a query with parameters (? placeholders), it needs to analyze the parameter types. Instead of recalculating this metadata for each query execution, Hibernate caches the metadata.
+          fail_on_pagination_over_collection_fetch: true # default false. is a Hibernate setting that controls whether an exception should be thrown when pagination (setFirstResult() / setMaxResults()) is used in conjunction with fetching a collection (JOIN FETCH).
+        jdbc:
+          batch_size: 50
+options:
+#  run-startup-tasks: true
+#  enable-scheduling: true
+  query-logging:
+    use-query-logging: true
+    use-slow-query-logging: true
+    count-executed-queries-logging: false
+    slow-query-threshold-in-ms: 500
+  transaction-logging:
+    enabled: false
+  app:
+    ui-url: "${UI_URL:http://localhost:${server.port}}"
+    cors-origin-pattern: "${UI_CORS_ORIGIN_PATTERN:http://localhost:${server.port}}"
+    api-url: "${API_URL:http://localhost:${server.port}}"
+  jwt-settings:
+    issuer: "sbtemplate-api"
+    expirationInMinutes: "${JWT_EXPIRATION_IN_MINUTES:300}"
+    refreshTokenExpirationInDays: 30
+    secret: "${JWT_SECRET:rydnadeimvajInt5}"
+  amazon:
+    s3:
+      enabled: false
+      override-env-variable-credentials: false
+      region: "${AWS_REGION}"
+      endpoint-override: "${S3_ENDPOINT:}"
+      buckets:
+        public-buckets:
+          - type: PUBLIC_BUCKET
+            name: "${S3_BUCKET_PUBLIC}"
+        private-buckets:
+          - type: PRIVATE_BUCKET
+            name:  "${S3_BUCKET_PRIVATE}"
+  europeana:
+    api-key: ${EUROPEANA_API_KEY:}
+  storage:
+    directory: ${LOCAL_STORAGE_DIR:/input}
+  sketchfab:
+    api-key: ${SKETCHFAB_API_KEY:}
+  blender:
+    thumbnail-script: ${BLENDER_THUMBNAIL_SCRIPT:classpath:/blender/thumb_render.py}
+    info-script: ${BLENDER_INFO_SCRIPT:classpath:/blender/model_info.py}
+    convert-script: ${BLENDER_CONVERT_SCRIPT:classpath:/blender/model_convert.py}
+    usdz-optimize-script: ${BLENDER_USDZ_OPTIMIZE_SCRIPT:classpath:/blender/usdz_optimize.py}
+  toolkit:
+    info-provider: ${MODEL_INFO_PROVIDER:BLENDER}
+  converter:
+    mesh-convert-blender-fallback: ${MESH_CONVERT_BLENDER_FALLBACK:true}
+  triposr:
+    dir: ${TRIPOSR_DIR:/triposr}
+    python: ${TRIPOSR_PYTHON:/usr/local/bin/python3.10}
+    device: ${TRIPOSR_DEVICE:cpu}
+    save-format: ${TRIPOSR_SAVE_FORMAT:glb}
+  job:
+    max-concurrency: ${JOB_MAX_CONCURRENCY:2}
+    output-retention-minutes: ${JOB_OUTPUT_RETENTION_MINUTES:60}
+    cleanup-interval-minutes: ${JOB_CLEANUP_INTERVAL_MINUTES:10}

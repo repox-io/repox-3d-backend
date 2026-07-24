@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="RegistrationRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ProviderID"/>
+                <xs:element ref="SessionToken"/>
+                <xs:element ref="BackEnd"/>
+                <xs:element ref="FrontEnd"/>
+                <xs:element ref="Timestamp"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ProviderID" type="xs:NCName"/>
+    <xs:element name="SessionToken" type="xs:NCName"/>
+    <xs:element name="BackEnd">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Access-Control-Allow-Origin"/>
+                <xs:element ref="SupportedOptions"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Access-Control-Allow-Origin" type="xs:anyURI"/>
+    <xs:element name="FrontEnd">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="GUI"/>
+                <xs:element ref="SupportedOptions"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GUI">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ViewType"/>
+                <xs:element ref="Languages"/>
+                <xs:element ref="MobileOptimization"/>
+                <xs:element ref="MaxPolygonCount"/>
+                <xs:element ref="MaxTextureSize"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ViewType">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Languages">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Language"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Language">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:NCName">
+                    <xs:attribute name="default" type="xs:NCName"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="MobileOptimization">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="MaxPolygonCount" type="xs:integer"/>
+    <xs:element name="MaxTextureSize" type="xs:integer"/>
+    <xs:element name="Timestamp" type="xs:NMTOKEN"/>
+    <xs:element name="SupportedOptions">
+        <xs:complexType>
+            <xs:choice>
+                <xs:sequence>
+                    <xs:element ref="Scene"/>
+                    <xs:element ref="MultipleModels"/>
+                    <xs:element ref="ElementSelection"/>
+                    <xs:element ref="Elements"/>
+                    <xs:element ref="Measuring"/>
+                    <xs:element ref="Attachments"/>
+                    <xs:element ref="CustomBBox"/>
+                </xs:sequence>
+                <xs:sequence>
+                    <xs:element ref="Architecture"/>
+                    <xs:element ref="Analytics"/>
+                    <xs:element ref="MetadataRet"/>
+                    <xs:element ref="ProgressiveLoading"/>
+                    <xs:element ref="TimeMachine"/>
+                    <xs:element ref="FileFormats"/>
+                    <xs:element ref="DataProviders"/>
+                    <xs:element ref="FullText"/>
+                    <xs:element ref="Protocols"/>
+                    <xs:element ref="Authentication"/>
+                </xs:sequence>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Scene">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Autoload"/>
+                <xs:element ref="Zoom"/>
+                <xs:element ref="Pan"/>
+                <xs:element ref="BackgroundColor"/>
+                <xs:element ref="View"/>
+                <xs:element ref="Lights"/>
+                <xs:element ref="VR"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Autoload">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Zoom">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Pan">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="BackgroundColor">
+        <xs:complexType>
+            <xs:attribute name="default" use="required" type="xs:integer"/>
+            <xs:attribute name="value" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="View">
+        <xs:complexType>
+            <xs:attribute name="default" use="required" type="xs:NCName"/>
+            <xs:attribute name="value" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Lights">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="VR">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="MultipleModels">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Format"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ElementSelection">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Color"/>
+            </xs:sequence>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Color">
+        <xs:complexType>
+            <xs:attribute name="default" type="xs:NCName"/>
+            <xs:attribute name="value" use="required" type="xs:NMTOKEN"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Elements">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Element"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Element">
+        <xs:complexType>
+            <xs:attribute name="name" use="required"/>
+            <xs:attribute name="type" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Measuring">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Tool"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Tool">
+        <xs:complexType>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="precision" use="required" type="xs:decimal"/>
+            <xs:attribute name="unit" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Attachments">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Format"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CustomBBox">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Architecture">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Access-Control-Allow-Method"/>
+            </xs:sequence>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Access-Control-Allow-Method" type="xs:NCName"/>
+    <xs:element name="Analytics">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="UsageTracking"/>
+                <xs:element ref="PerformanceMetrics"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UsageTracking">
+        <xs:complexType>
+            <xs:attribute name="enabled" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="PerformanceMetrics">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Metric"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Metric">
+        <xs:complexType>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="MetadataRet">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="MetadataElement"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="MetadataElement">
+        <xs:complexType>
+            <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
+            <xs:attribute name="readonly" use="required" type="xs:NCName"/>
+            <xs:attribute name="type" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ProgressiveLoading">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="TimeMachine">
+        <xs:complexType>
+            <xs:attribute name="value" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FileFormats">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Format"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DataProviders">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="CloudStorages"/>
+                <xs:element ref="Databases"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CloudStorages">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Storage"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Storage">
+        <xs:complexType>
+            <xs:attribute name="name" use="required"/>
+            <xs:attribute name="storage-size" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Databases">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Database"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Database">
+        <xs:complexType>
+            <xs:attribute name="db-size" use="required" type="xs:integer"/>
+            <xs:attribute name="endpoint" use="required" type="xs:NCName"/>
+            <xs:attribute name="language" use="required" type="xs:NCName"/>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="public" use="required" type="xs:NCName"/>
+            <xs:attribute name="tcp-port" use="required" type="xs:integer"/>
+            <xs:attribute name="type" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FullText">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Search"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Search">
+        <xs:complexType>
+            <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Protocols">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Protocol"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Authentication">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="Protocol"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Format">
+        <xs:complexType>
+            <xs:attribute name="extension" type="xs:NMTOKEN"/>
+            <xs:attribute name="extensione" type="xs:NMTOKEN"/>
+            <xs:attribute name="mimetype" use="required"/>
+            <xs:attribute name="native" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Protocol">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:NCName"/>
+            <xs:attribute name="value" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

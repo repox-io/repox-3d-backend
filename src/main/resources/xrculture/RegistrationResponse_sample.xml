@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Platform Response to Registration -->
+<RegistrationResponse>
+    <Status>200
+    </Status>  <!-- SUCCESS / use standard HTML response status codes https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status -->
+    <ServiceKey>MIIBIjANBgkqh....
+    </ServiceKey> <!-- private key for any further communications between services and middleware -->
+    <Message>Registration successful.</Message>
+</RegistrationResponse>

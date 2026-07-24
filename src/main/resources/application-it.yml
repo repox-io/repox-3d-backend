@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  error:
+    include-exception: true
+    include-binding-errors: always
+    include-message: always
+    include-stacktrace: always
+    whitelabel:
+      enabled: true
+    path: "/error"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      security:
+        enabled: false
+spring:
+  jpa:
+    properties:
+      hibernate:
+        generate_statistics: false
+options:
+  query-logging:
+    use-query-logging: false
+    use-slow-query-logging: true
+    count-executed-queries-logging: true
+    slow-query-threshold-in-ms: 500
+  jwt-settings:
+    issuer: "sbtemplate-api"
+    expirationInMinutes: 1
+    secret: "${JWT_SECRET}"

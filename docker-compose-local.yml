@@ -1,0 +1,48 @@
+services:
+  database:
+    image: 'postgres:16'
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: '1234567890'
+      POSTGRES_DB: 'repox_3d_api'
+#  greenMail:   #mock smtp service
+#    image: greenmail/standalone:1.6.14
+#    ports:
+#      - '3025:3025' #SMTP
+#      - '3143:3143' #IMAP
+#      - '3465:3465' #POP3
+#    environment:
+#      GREENMAIL_OPTS: '-Dgreenmail.setup.test.all
+#         -Dgreenmail.hostname=0.0.0.0
+#         -Dgreenmail.users=duke:springboot@email.test
+#         -Dgreenmail.verbose '
+#  minio:
+#    image: minio/minio
+#    ports:
+#      - "8082:9000"
+#      - "8083:9001"
+#    environment:
+#      MINIO_ROOT_USER: root
+#      MINIO_ROOT_PASSWORD: password
+#    volumes:
+#      - './dockervolumes/minio:/data'
+#    command: server --console-address ":9001" /data
+#    healthcheck:
+#      test: [ "CMD", "mc", "ready", "local" ]
+#      interval: 1s
+#      timeout: 2s
+#      retries: 5
+#  minio_make_bucket:
+#    image: minio/minio
+#    environment:
+#      MC_HOST_compose: 'http://root:password@minio:9000'
+#    command: >
+#      -c '
+#        mc mb compose/privatebucket
+#        mc mb compose/publicbucket
+#        mc policy set public compose/publicbucket
+#        while true; do sleep 30; done'
+#    entrypoint: /bin/bash
+#    depends_on: [ minio ]

@@ -1,0 +1,30 @@
+server:
+  port: ${API_PORT}
+  servlet:
+    context-path: "${CONTEXT_PATH:/}"
+  error:
+    include-exception: true
+    include-binding-errors: always
+    include-message: always
+    include-stacktrace: always
+    whitelabel:
+      enabled: true
+    path: "/error"
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+springdoc:
+  show-actuator: true
+  api-docs:
+    enabled: true
+    path: "/api-docs"
+  swagger-ui:
+    enabled: true
+    path: "/swagger-ui.html"
+options:
+  query-logging:
+    use-query-logging: false
+    use-slow-query-logging: true
+    count-executed-queries-logging: false
+    slow-query-threshold-in-ms: 100

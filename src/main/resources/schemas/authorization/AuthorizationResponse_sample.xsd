@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="AuthorizationResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Status"/>
+                <xs:element ref="SessionToken"/>
+                <xs:element ref="ExpiresIn"/>
+                <xs:element ref="Message"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Status" type="xs:integer"/>
+    <xs:element name="SessionToken" type="xs:NCName"/>
+    <xs:element name="ExpiresIn" type="xs:integer"/>
+    <xs:element name="Message" type="xs:string"/>
+</xs:schema>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="Standard-Logging-Config">
+    <Properties>
+        <Property name="CLR">
+            {FATAL=bright red, ERROR=red, WARN=bright yellow, INFO=Normal, DEBUG=green, TRACE=black}
+        </Property>
+        <Property name="LOG_PATTERN">
+            %highlight{%d{yy-MM-dd}}${CLR} | %highlight{%d{HH:mm:ss.SSS}}${CLR} | %clr{%2level}${CLR} |%magenta{[%-15.15thread]} | %cyan{%-70.70logger{70}} %highlight{: %m%n%xwEx}${CLR}
+        </Property>
+        <Property name="LOG_PATTERN_WITH_PID">
+            %highlight{%d{yy-MM-dd}}${CLR} | %highlight{%d{HH:mm:ss.SSS}}${CLR} | %clr{%2level}${CLR} | %magenta{${sys:PID}} | %highlight{[%thread]}${CLR} | %cyan{%logger{70}} %highlight{: %m%n%xwEx}${CLR}
+        </Property>
+        <Property name="OLD_LOG_PATTERN">
+            %d{yyyy-MM-dd} | %d{HH:mm:ss.SSS} | %2level | %-15.15thread | %-70.70logger{70} | %m%n
+        </Property>
+    </Properties>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}" disableAnsi="false" charset="UTF-8"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <AsyncRoot level="info">
+            <AppenderRef ref="STDOUT"/>
+        </AsyncRoot>
+        <AsyncLogger name="org.hibernate" level="INFO" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </AsyncLogger>
+        <AsyncLogger name="net.ttddyy.dsproxy.listener" level="DEBUG" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </AsyncLogger>
+    </Loggers>
+</Configuration>

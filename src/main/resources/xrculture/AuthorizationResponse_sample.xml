@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Platform Response to Authorization -->
+<AuthorizationResponse>
+    <Status>202
+    </Status> <!-- ACCEPTED / use standard HTML response status codes https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status -->
+    <SessionToken>eyJhbGciOi...</SessionToken>
+    <ExpiresIn>3600</ExpiresIn> <!-- in seconds -->
+    <Message>Service successfully authorized.</Message>
+</AuthorizationResponse>

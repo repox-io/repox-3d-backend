@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="ModelLoadingRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ServiceID"/>
+                <xs:element ref="SessionToken"/>
+                <xs:element ref="Source"/>
+                <xs:element ref="SceneInit"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ServiceID" type="xs:integer"/>
+    <xs:element name="SessionToken" type="xs:string"/>
+    <xs:element name="Source">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="UrlSource"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UrlSource">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="FileExtension"/>
+                <xs:element ref="FileDimension"/>
+                <xs:element ref="Url"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FileExtension" type="xs:NMTOKEN"/>
+    <xs:element name="FileDimension" type="xs:integer"/>
+    <xs:element name="Url" type="xs:anyURI"/>
+    <xs:element name="SceneInit">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Zoom"/>
+                <xs:element ref="Pan"/>
+                <xs:element ref="BackgroundColor"/>
+                <xs:element ref="View"/>
+                <xs:element ref="Lights"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Zoom">
+        <xs:complexType>
+            <xs:attribute name="default" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Pan">
+        <xs:complexType>
+            <xs:attribute name="default" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="BackgroundColor">
+        <xs:complexType>
+            <xs:attribute name="default" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="View">
+        <xs:complexType>
+            <xs:attribute name="default" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Lights">
+        <xs:complexType>
+            <xs:attribute name="default" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

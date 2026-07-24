@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="AuthorizationRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ProviderID"/>
+                <xs:element ref="ServiceName"/>
+                <xs:element ref="Endpoint"/>
+                <xs:element ref="PublicKey"/>
+                <xs:element ref="ContactEmail"/>
+                <xs:element ref="Timestamp"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ProviderID" type="xs:NCName"/>
+    <xs:element name="ServiceName" type="xs:NCName"/>
+    <xs:element name="Endpoint" type="xs:anyURI"/>
+    <xs:element name="PublicKey" type="xs:NCName"/>
+    <xs:element name="ContactEmail" type="xs:string"/>
+    <xs:element name="Timestamp" type="xs:NMTOKEN"/>
+</xs:schema>

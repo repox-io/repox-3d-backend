@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TechnicalMetadataExtractionRequest>
+    <ServiceID>0003</ServiceID>
+    <SessionToken>e3be7cc2-3a7e-45e6-9a88-bd364e6de740</SessionToken>
+    <Source>
+        <!-- The model bytes, base64 encoded (truncated here). The extension decides which analyzer
+             runs, so either filename must include it or the extension attribute must be set. -->
+        <LocalSource filename="DamagedHelmet.glb" extension=".glb" dimension="873796">
+            Z2xURgIAAABwAAAA...base64...
+        </LocalSource>
+        <!-- Alternatively, point at the model instead of inlining it:
+        <UrlSource>
+            <FileExtension>.glb</FileExtension>
+            <FileDimension>873796</FileDimension>
+            <Url>https://raw.githubusercontent.com/kovacsv/Online3DViewer/dev/test/testfiles/gltf/DamagedHelmet/glTF-Binary/DamagedHelmet.glb</Url>
+        </UrlSource>
+        -->
+    </Source>
+    <Timestamp>2026-07-20T14:32:05Z</Timestamp>
+</TechnicalMetadataExtractionRequest>

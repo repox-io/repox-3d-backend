@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModelLoadingResponse>
+    <Status>206</Status>  <!-- PARTIAL CONTENT / use standard HTML response status codes https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status -->
+    <ServiceKey>MIIBIjANBgkqh....</ServiceKey> <!-- private key for any further communications between services and middleware -->
+    <Message>Loading...</Message>
+    <LoadedContent>1256</LoadedContent> <!-- loaded content so far in kB -->
+    <Endpoint>https://viewer/models?id=kdsjbfkdjsbgldnsfldsnkfn</Endpoint> <!-- full link to the model inside the viewer -->
+</ModelLoadingResponse>

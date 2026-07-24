@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="ModelLoadingResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Status"/>
+                <xs:element ref="ServiceKey"/>
+                <xs:element ref="Message"/>
+                <xs:element ref="LoadedContent"/>
+                <xs:element ref="Endpoint"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Status" type="xs:integer"/>
+    <xs:element name="ServiceKey" type="xs:NCName"/>
+    <xs:element name="Message" type="xs:NCName"/>
+    <xs:element name="LoadedContent" type="xs:integer"/>
+    <xs:element name="Endpoint" type="xs:anyURI"/>
+</xs:schema>

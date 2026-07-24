@@ -1,0 +1,77 @@
+logging:
+  level:
+    ROOT: INFO
+  error:
+    include-exception: true
+    include-binding-errors: always
+    include-message: always
+    include-stacktrace: always
+    whitelabel:
+      enabled: true
+    path: "/error"
+server:
+  port: 8081
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      security:
+        enabled: false
+springdoc:
+  show-actuator: true
+  api-docs:
+    enabled: true
+    path: "/api-docs"
+  swagger-ui:
+    enabled: true
+    path: "/swagger-ui.html"
+spring:
+  docker:
+    compose:
+      enabled: true
+      file: "docker-compose-local.yml"
+      lifecycle-management:  start_only
+      skip:
+        in-tests: true
+  datasource:
+    url: "jdbc:postgresql://host.docker.internal:5433/repox_3d_api?reWriteBatchedInserts=true"
+    username: "postgres"
+    password: "1234567890" #same as in docker-compose-local.yml
+  jpa:
+    properties:
+      hibernate:
+        generate_statistics: false
+options:
+  query-logging:
+    use-query-logging: false
+    use-slow-query-logging: true
+    count-executed-queries-logging: true
+    slow-query-threshold-in-ms: 500
+  app:
+    ui-url: "http://localhost:${server.port}"
+    cors-origin-pattern: "http://localhost:${server.port}"
+    api-url: "http://localhost:${server.port}"
+  jwt-settings:
+    issuer: "sbtemplate-api"
+    #six months
+    expirationInMinutes: 265000
+    secret: "${JWT_SECRET}"
+  amazon:
+    s3:
+      enabled: false
+      override-env-variable-credentials: true
+      endpoint-override: "http://localhost:8082"
+      region: "us-east-1"
+      credentials:
+        key: "root"
+        secret: "password"
+      buckets:
+        public-buckets:
+          - type: PUBLIC_BUCKET
+            name: "publicbucket" #defined and created in docker-compose-local.yml
+        private-buckets:
+          - type: PRIVATE_BUCKET
+            name: "privatebucket" #defined and created in docker-compose-local.yml
+  europeana:
+    api-key: ${EUROPEANA_API_KEY:nLbaXYaiH}
