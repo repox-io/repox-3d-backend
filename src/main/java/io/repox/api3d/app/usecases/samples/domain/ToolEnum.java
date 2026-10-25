@@ -10,5 +10,6 @@ public enum ToolEnum {
     CONVERT,
     THUMBNAIL,
     DETAILS,
-    VIEWER
+    VIEWER,
+    GALLERY
 }

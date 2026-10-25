@@ -6,6 +6,7 @@ import io.repox.api3d.app.usecases.job.application.ports.in.ProcessingJobUseCase
 import io.repox.api3d.app.usecases.job.domain.ModelProcessingJobType;
 import io.repox.api3d.app.usecases.toolkit.application.ports.in.SceneAndModelInfoUseCase;
 import io.repox.api3d.app.usecases.toolkit.domain.ModelDetectionDto;
+import io.repox.api3d.app.usecases.toolkit.domain.ModelSourceInfoDto;
 import io.repox.api3d.app.usecases.toolkit.domain.ModelTechnicalDetailsDto;
 import io.repox.api3d.app.utils.ModelSourceUtils;
 import io.repox.api3d.appconfig.OpenApiTagConfig;
@@ -70,6 +71,43 @@ public class SceneAndModelInfoController {
         return ModelSourceUtils.isUpload(file, url)
                 ? sceneAndModelInfoUseCase.detect(file)
                 : sceneAndModelInfoUseCase.detectFromUri(url);
+    }
+
+    @Operation(
+            summary = "Submit a job to retrieve the size, filename and content type of a source supplied by file"
+                    + " upload or URL.",
+            description = "Asynchronous: returns 202 with a job to poll; the source info arrives in the job's result"
+                    + " once it completes. Use /tools/info/inline to block and get the info directly. Describes the"
+                    + " source as delivered, not the model inside it — for the latter use /tools/details. Note that"
+                    + " for an upload the content type is inferred from the extension here and so is usually null"
+                    + " for 3D formats; /tools/info/inline reports the type the client sent.")
+    @PostMapping(value = "/tools/info")
+    ResponseEntity<JobStatusDto> generateSourceInfo(
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "url", required = false) String url) {
+        return JobResponses.accepted(
+                ModelSourceUtils.isUpload(file, url)
+                        ? processingJobUseCase.submitWithUpload(ModelProcessingJobType.MODEL_INFO, file, null)
+                        : processingJobUseCase.submit(ModelProcessingJobType.MODEL_INFO, url, null));
+    }
+
+    @Operation(
+            summary = "Retrieve the size, filename and content type of a source supplied by file upload or URL,"
+                    + " inline.",
+            description = "Synchronous and lightweight: for a URL the body is never downloaded — a single HEAD"
+                    + " reports the size, filename and content type at once, falling back to a one-byte ranged"
+                    + " request when the server advertises no Content-Length. sizeBytes is null when the host"
+                    + " was reached but states no size, which means unknown rather than empty. A URL that"
+                    + " cannot be reached fails with the status the host returned (an upstream 5xx becomes"
+                    + " 502) instead of returning nulls.")
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(value = "/tools/info/inline", produces = MediaType.APPLICATION_JSON_VALUE)
+    ModelSourceInfoDto generateSourceInfoInline(
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "url", required = false) String url) {
+        return ModelSourceUtils.isUpload(file, url)
+                ? sceneAndModelInfoUseCase.sourceInfo(file)
+                : sceneAndModelInfoUseCase.sourceInfoFromUri(url);
     }
 
     @Operation(summary = "Supported 3D model file types.")

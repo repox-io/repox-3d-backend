@@ -13,7 +13,6 @@ import io.repox.api3d.app.usecases.storage.application.ports.out.FileStoragePort
 import io.repox.api3d.app.utils.ApplicationClock;
 import io.repox.api3d.app.utils.RandomFilenamePrefix;
 import io.repox.api3d.app.utils.UrlSourceUtils;
-import io.repox.api3d.app.utils.exception.KnownRuntimeError;
 import io.repox.api3d.appconfig.options.JobProperties;
 import java.io.File;
 import java.io.InputStream;
@@ -73,12 +72,10 @@ public class ProcessingJobService implements ProcessingJobUseCase {
 
     @Override
     public JobStatusDto submit(ModelProcessingJobType type, String url, Object options) {
-        // Cheap submit-time guard: confirm the URL resolves (HEAD, no body download) so an obviously bad
-        // link is rejected up front. The content is downloaded and validated lazily by the worker, so the
-        // request thread does not wait for the (potentially large) download.
-        if (!urlSourceUtils.remoteResourceExists(url)) {
-            throw new KnownRuntimeError("Source URL is not reachable or the content does not exist: " + url);
-        }
+        // Cheap submit-time guard: confirm the URL resolves (HEAD, no body download) so a bad link is
+        // rejected up front, reporting the host's own status. The content is downloaded and validated lazily
+        // by the worker, so the request thread does not wait for the (potentially large) download.
+        urlSourceUtils.verifyRemoteResourceExists(url);
         return enqueue(type, JobInput.fromUrl(url, toJsonNode(options)));
     }
 

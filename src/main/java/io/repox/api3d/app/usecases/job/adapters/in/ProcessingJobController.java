@@ -40,7 +40,7 @@ public class ProcessingJobController {
                 .build());
     }
 
-    @Operation(summary = "Download the output produced by a processing job.")
+    @Operation(summary = "Download the output file produced by a processing job.")
     @GetMapping(value = "/jobs/{id}/output")
     ResponseEntity<StreamingResponseBody> downloadOutput(@PathVariable UUID id) {
         JobOutputResolution resolution = processingJobUseCase.resolveOutput(id);

@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,10 +72,10 @@ class ProcessingJobServiceTests {
                 List.of(processor));
     }
 
-    /** URL submissions do a HEAD existence check at submit time; let it pass by default. */
+    /** URL submissions do a HEAD existence check at submit time; let it pass by default (it throws on failure). */
     @BeforeEach
     void stubUrlExists() {
-        when(urlSourceUtils.remoteResourceExists(any())).thenReturn(true);
+        doNothing().when(urlSourceUtils).verifyRemoteResourceExists(any());
     }
 
     @Test
@@ -141,12 +143,17 @@ class ProcessingJobServiceTests {
     }
 
     @Test
-    void urlThatDoesNotResolveIsRejectedAndNotEnqueued() {
-        when(urlSourceUtils.remoteResourceExists(any())).thenReturn(false);
+    void urlThatDoesNotResolveIsRejectedAndNotEnqueuedReportingTheUpstreamStatus() {
+        doThrow(KnownRuntimeError.withStatus(404, "Source URL returned HTTP 404: http://example/missing.glb"))
+                .when(urlSourceUtils)
+                .verifyRemoteResourceExists(any());
 
         assertThatThrownBy(() -> service(noopProcessor())
                         .submit(ModelProcessingJobType.MESH_COMPRESS, "http://example/missing.glb", "OPTS"))
-                .isInstanceOf(KnownRuntimeError.class);
+                .isInstanceOf(KnownRuntimeError.class)
+                // The guard must not flatten the host's status into a generic 400.
+                .extracting(e -> ((KnownRuntimeError) e).httpStatus())
+                .isEqualTo(404);
 
         assertThat(repository.findByStatusIn(Arrays.asList(ModelProcessingJobStatus.values())))
                 .isEmpty(); // no job was persisted for an unreachable URL

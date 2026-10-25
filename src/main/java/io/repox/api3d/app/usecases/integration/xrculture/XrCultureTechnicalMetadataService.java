@@ -144,6 +144,12 @@ public class XrCultureTechnicalMetadataService implements XrCultureTechnicalMeta
             return HttpStatus.UNSUPPORTED_MEDIA_TYPE;
         }
         if (e instanceof KnownRuntimeError knownRuntimeError) {
+            // An explicitly carried status exists because ErrorType could not express it (e.g. one relayed
+            // from an upstream host), so it wins over the coarse mapping below.
+            if (knownRuntimeError.httpStatus() != null) {
+                HttpStatus resolved = HttpStatus.resolve(knownRuntimeError.httpStatus());
+                return resolved == null ? HttpStatus.INTERNAL_SERVER_ERROR : resolved;
+            }
             return switch (knownRuntimeError.errorType()) {
                 case FORBIDDEN -> HttpStatus.FORBIDDEN;
                 case NOT_FOUND -> HttpStatus.NOT_FOUND;

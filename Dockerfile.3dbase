@@ -1,44 +1,18 @@
 # ============================================================================
 # Stable "processing arsenal" base image for repox-3d-api.
 #
-# Contains the slow-changing toolchain (Blender, assimp, gltfpack, GaussForge,
-# TripoSR + Python + model weights, rembg) so the application Dockerfile only
-# has to compile the jar and layer it on top. Rebuild/push this ONLY when the
-# toolchain changes; bump the tag and update ARG BASE_IMAGE in Dockerfile.
+# Contains the slow-changing toolchain (Blender, assimp, gltfpack, GaussForge)
+# so the application Dockerfile only has to compile the jar and layer it on top.
+# Rebuild/push this ONLY when the toolchain changes; bump the tag and update
+# ARG BASE_IMAGE in Dockerfile.
+#
+# TripoSR (Python 3.10, torch, model weights, rembg) is no longer part of this
+# image; it moves to the repox-3dtools-triposr service. See
+# repox-3dtools-triposr-handover.md.
 #
 #   docker build -f Dockerfile.3dbase -t <registry>/<namespace>/repox-3d-base:1.0.0 .
 #   docker push <registry>/<namespace>/repox-3d-base:1.0.0
 # ============================================================================
-
-# ---------- TripoSR (adapted from official, CPU only) ----------
-FROM python:3.10-slim AS triposr
-ARG DEBIAN_FRONTEND=noninteractive
-ENV PYTHONUNBUFFERED=1
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        build-essential \
-        git \
-        libgl1 \
-        libglib2.0-0 \
-        libsm6 \
-        libxext6 \
-        libxrender1 \
-        libstdc++6 \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip install --upgrade pip setuptools ninja
-RUN pip install torch==2.2.1 --index-url https://download.pytorch.org/whl/cpu
-WORKDIR /triposr
-# Pin TRIPOSR_REF to a commit/tag for reproducible base rebuilds (defaults to latest main).
-ARG TRIPOSR_REF=main
-RUN git clone https://github.com/VAST-AI-Research/TripoSR . \
-    && git checkout ${TRIPOSR_REF}
-RUN pip install -r requirements.txt
-RUN pip install onnxruntime rembg
-# Pre-bake TripoSR model weights
-RUN python -c "from tsr.system import TSR; TSR.from_pretrained('stabilityai/TripoSR', 'config.yaml', 'model.ckpt')"
-# Pre-bake rembg u2net model
-RUN python -c "import rembg; rembg.new_session()"
 
 # ---------- GaussForge (gfconvert) build ----------
 # Built from source because there is no prebuilt Linux binary. Needs CMake >= 3.26, so we use Ubuntu
@@ -119,30 +93,10 @@ RUN wget -q "https://github.com/zeux/meshoptimizer/releases/download/v${GLTFPACK
 # Install gfconvert (GaussForge) from the build stage for Gaussian-splat conversion.
 COPY --from=gfconvert-build /src/build/gfconvert /usr/local/bin/gfconvert
 
-# Copy TripoSR + Python 3.10 runtime from triposr stage
-COPY --from=triposr /triposr /triposr
-COPY --from=triposr /usr/local/lib/python3.10 /usr/local/lib/python3.10
-COPY --from=triposr /usr/local/lib/libpython3.10.so.1.0 /usr/local/lib/libpython3.10.so.1.0
-COPY --from=triposr /usr/local/bin/python3.10 /usr/local/bin/python3.10
-COPY --from=triposr /usr/local/bin/pip /usr/local/bin/pip
-RUN ldconfig
-
-# Create non-root user with home directory and copy HF weights cache into it
+# Create non-root user with home directory
 RUN useradd -r -u 10001 -g root -m -d /home/appuser appuser
-COPY --from=triposr /root/.cache/huggingface /home/appuser/.cache/huggingface
-COPY --from=triposr /root/.u2net /home/appuser/.u2net
 
 # Prepare the app working dir + toolkit I/O dirs (the jar is added by the application Dockerfile).
-RUN mkdir -p /app /input /output /tmp/numba_cache && \
-    chown -R appuser:root /app /input /output /triposr /tmp/numba_cache /home/appuser /home/appuser/.u2net && \
-    chmod 777 /tmp/numba_cache
+RUN mkdir -p /app /input /output && \
+    chown -R appuser:root /app /input /output /home/appuser
 WORKDIR /app
-
-ENV TRIPOSR_DIR=/triposr \
-    TRIPOSR_DEVICE=cpu \
-    TRIPOSR_SAVE_FORMAT=glb \
-    TRIPOSR_PYTHON=/usr/local/bin/python3.10 \
-    PYTHONUNBUFFERED=1 \
-    HF_HUB_OFFLINE=1 \
-    TRANSFORMERS_OFFLINE=1 \
-    NUMBA_CACHE_DIR=/tmp/numba_cache

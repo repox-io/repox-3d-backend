@@ -80,6 +80,8 @@ or quality knob to add. Reuses the `SPLAT_CONVERT` job type/processor under the 
 
 - **Image → 3D** — `POST /tools/image-to-3d` (TripoSR) *generates* a GLB from a single photo. It is
   a generation step, not a format conversion or compression, and is listed here only for orientation.
+  It currently answers **501** while TripoSR moves to `repox-3dtools-triposr`
+  (see `repox-3dtools-triposr-handover.md`).
 
 ---
 

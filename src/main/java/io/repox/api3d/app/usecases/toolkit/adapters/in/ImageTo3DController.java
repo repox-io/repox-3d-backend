@@ -17,7 +17,9 @@ public class ImageTo3DController {
 
     private final ImageTo3DUseCase imageTo3DUseCase;
 
-    @Operation(summary = "Convert an uploaded image to a 3D GLB model using TripoSR.")
+    @Operation(
+            summary = "Convert an uploaded image to a 3D GLB model using TripoSR.",
+            description = "Not available yet: answers 501 until the repox-3dtools-triposr service is integrated.")
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(
             value = "/tools/image-to-3d",

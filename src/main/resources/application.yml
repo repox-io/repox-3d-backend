@@ -154,11 +154,6 @@ options:
     info-provider: ${MODEL_INFO_PROVIDER:BLENDER}
   converter:
     mesh-convert-blender-fallback: ${MESH_CONVERT_BLENDER_FALLBACK:true}
-  triposr:
-    dir: ${TRIPOSR_DIR:/triposr}
-    python: ${TRIPOSR_PYTHON:/usr/local/bin/python3.10}
-    device: ${TRIPOSR_DEVICE:cpu}
-    save-format: ${TRIPOSR_SAVE_FORMAT:glb}
   job:
     max-concurrency: ${JOB_MAX_CONCURRENCY:2}
     output-retention-minutes: ${JOB_OUTPUT_RETENTION_MINUTES:60}

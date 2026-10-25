@@ -57,8 +57,8 @@ public class ModelTypeDetector {
 
     /**
      * Detects the kind of the input named {@code filename}, sniffing {@code headerBytes} only when the
-     * extension cannot settle it. Throws {@link KnownRuntimeError} (mapped to 422) when the type cannot be
-     * determined.
+     * extension cannot settle it. Throws {@link KnownRuntimeError} (mapped to 400) when the type cannot be
+     * determined. A failure to fetch the header from a URL propagates with the status the host reported.
      */
     public ModelDetectionDto detect(String filename, HeaderBytesSupplier headerBytes) {
         String ext = extensionOf(filename);

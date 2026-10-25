@@ -83,8 +83,9 @@ public class TempFileStorageService implements FileStoragePort {
             HttpResponse<InputStream> response =
                     httpClient.send(buildGetRequest(uri), HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                throw new IOException(
-                        "Server returned HTTP response code: " + response.statusCode() + " for URL: " + uri);
+                // Not an IOException: the download never started because the host refused it, and the caller
+                // should see that refusal with the host's own status rather than a generic 500.
+                throw UrlSourceUtils.upstreamStatusError(uri, response.statusCode());
             }
             String effectiveFilename = resolveEffectiveFilename(
                     originalFilename,
@@ -110,8 +111,9 @@ public class TempFileStorageService implements FileStoragePort {
             HttpResponse<InputStream> response =
                     httpClient.send(buildGetRequest(uri), HttpResponse.BodyHandlers.ofInputStream());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                throw new IOException(
-                        "Server returned HTTP response code: " + response.statusCode() + " for URL: " + uri);
+                // Not an IOException: the download never started because the host refused it, and the caller
+                // should see that refusal with the host's own status rather than a generic 500.
+                throw UrlSourceUtils.upstreamStatusError(uri, response.statusCode());
             }
             String filename = inputFilename(resolveFilenameFromResponse(uri, response), addRandomFilenamePrefix);
             Path filePath = inputDir().resolve(filename);

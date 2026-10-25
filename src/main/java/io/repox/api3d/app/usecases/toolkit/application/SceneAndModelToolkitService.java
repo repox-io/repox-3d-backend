@@ -4,7 +4,9 @@ import io.repox.api3d.app.usecases.storage.application.ports.out.FileStoragePort
 import io.repox.api3d.app.usecases.toolkit.application.ports.in.SceneAndModelInfoUseCase;
 import io.repox.api3d.app.usecases.toolkit.application.ports.out.ModelInfoAnalyzer;
 import io.repox.api3d.app.usecases.toolkit.domain.ModelDetectionDto;
+import io.repox.api3d.app.usecases.toolkit.domain.ModelSourceInfoDto;
 import io.repox.api3d.app.usecases.toolkit.domain.ModelTechnicalDetailsDto;
+import io.repox.api3d.app.utils.RandomFilenamePrefix;
 import io.repox.api3d.app.utils.UrlSourceUtils;
 import io.repox.api3d.app.utils.UrlUtils;
 import io.repox.api3d.app.utils.exception.KnownRuntimeError;
@@ -16,6 +18,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -107,6 +111,50 @@ public class SceneAndModelToolkitService implements SceneAndModelInfoUseCase {
         return modelTypeDetector.detect(filename, () -> urlSourceUtils.fetchHeadBytes(url, DETECTION_HEADER_BYTES));
     }
 
+    @Override
+    public ModelSourceInfoDto sourceInfo(MultipartFile file) {
+        // Everything asked for is already in hand: nothing is written to storage and nothing is read.
+        return new ModelSourceInfoDto(file.getSize(), file.getOriginalFilename(), file.getContentType());
+    }
+
+    @Override
+    public ModelSourceInfoDto sourceInfoFromUri(String url) {
+        log.debug("Probing source info for file url : {}", url);
+        // One HEAD answers all three questions. The body is never fetched, so this stays cheap no matter how
+        // large the model is — the whole point of the endpoint. An unreachable or missing URL throws rather
+        // than reporting nulls; a null here means only that the server refuses HEAD.
+        UrlSourceUtils.RemoteSourceInfo remote =
+                urlSourceUtils.remoteSourceInfo(url).orElse(null);
+        Long size = remote == null ? null : remote.contentLength();
+        if (size == null) {
+            // No Content-Length (chunked, or a sparse HEAD): ask for a single byte and read the total out of
+            // Content-Range. Still no download. An empty result means the server states no total, so the size
+            // is reported as unknown; a failed probe throws.
+            size = urlSourceUtils.remoteContentLengthByRange(url).stream()
+                    .boxed()
+                    .findFirst()
+                    .orElse(null);
+        }
+        String filename =
+                remote == null || !StringUtils.hasText(remote.filename()) ? pathFilename(url) : remote.filename();
+        return new ModelSourceInfoDto(size, filename, remote == null ? null : remote.contentType());
+    }
+
+    @Override
+    public ModelSourceInfoDto sourceInfoFromFile(File input) {
+        try {
+            String filename = RandomFilenamePrefix.strip(input.getName());
+            // The original multipart content type is not carried in the job input, so for the async upload
+            // path it is inferred from the extension; unknown extensions simply report null.
+            String contentType = MediaTypeFactory.getMediaType(filename)
+                    .map(MediaType::toString)
+                    .orElse(null);
+            return new ModelSourceInfoDto(input.length(), filename, contentType);
+        } finally {
+            fileStorage.delete(input);
+        }
+    }
+
     /**
      * Picks the filename whose extension drives detection. Prefers the URL path when it already carries an
      * extension (no network call); when it does not (e.g. an aggregator {@code /content} link), a single HEAD
@@ -115,7 +163,7 @@ public class SceneAndModelToolkitService implements SceneAndModelInfoUseCase {
      * advertises nothing, leaving detection to the header sniff.
      */
     private String resolveDetectionFilename(String url) {
-        String pathFilename = StringUtils.getFilename(UrlUtils.toUri(url).getPath());
+        String pathFilename = pathFilename(url);
         if (StringUtils.getFilenameExtension(pathFilename) != null) {
             return pathFilename;
         }
@@ -123,6 +171,11 @@ public class SceneAndModelToolkitService implements SceneAndModelInfoUseCase {
                 .remoteFilename(url)
                 .filter(name -> StringUtils.getFilenameExtension(name) != null)
                 .orElse(pathFilename);
+    }
+
+    /** The last path segment of a URL, used wherever the server advertises no filename of its own. */
+    private static String pathFilename(String url) {
+        return StringUtils.getFilename(UrlUtils.toUri(url).getPath());
     }
 
     private byte[] readHeaderBytes(MultipartFile file) throws IOException {

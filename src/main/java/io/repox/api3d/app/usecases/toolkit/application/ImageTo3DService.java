@@ -3,6 +3,7 @@ package io.repox.api3d.app.usecases.toolkit.application;
 import io.repox.api3d.app.usecases.storage.application.ports.out.FileStoragePort;
 import io.repox.api3d.app.usecases.toolkit.application.ports.in.ImageTo3DUseCase;
 import io.repox.api3d.app.usecases.toolkit.application.ports.out.TripoSRProcessPort;
+import io.repox.api3d.app.utils.exception.KnownRuntimeError;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -33,6 +34,9 @@ public class ImageTo3DService implements ImageTo3DUseCase {
             Files.createDirectories(outputDir.toPath());
             glbFile = tripoSRProcessPort.convert(imageFile, outputDir);
             return Files.readAllBytes(glbFile.toPath());
+        } catch (KnownRuntimeError e) {
+            // Keeps its status (e.g. 501 while TripoSR is unavailable) instead of collapsing to 500 below.
+            throw e;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);

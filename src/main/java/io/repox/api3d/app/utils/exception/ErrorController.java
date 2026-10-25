@@ -59,7 +59,8 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ProblemDetail> handleRuntimeExceptionWithCustomMessage(
             KnownRuntimeError ex, WebRequest request, Authentication authentication) {
 
-        ProblemDetail response = getStandardResponse(ex, request, fromKnownErrorType(ex.errorType()), ex.getMessage());
+        HttpStatus status = statusOf(ex);
+        ProblemDetail response = getStandardResponse(ex, request, status, ex.getMessage());
 
         log.info(
                 "ErrorController - Known Exception\n\tUser: {}\n\tRequest: {}\n\tResponse: {}",
@@ -68,7 +69,7 @@ public class ErrorController extends ResponseEntityExceptionHandler {
                 response,
                 ex);
 
-        return ResponseEntity.status(fromKnownErrorType(ex.errorType()))
+        return ResponseEntity.status(status)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(response);
     }
@@ -164,10 +165,26 @@ public class ErrorController extends ResponseEntityExceptionHandler {
         return authentication.getName();
     }
 
+    /**
+     * The status to report for a {@link KnownRuntimeError}: an explicitly carried one wins (it exists precisely
+     * because {@link KnownRuntimeError.ErrorType} could not express it, e.g. a status relayed from an upstream
+     * host), otherwise the status is derived from the error type. A non-standard explicit code degrades to 500
+     * rather than failing the error response itself.
+     */
+    HttpStatus statusOf(KnownRuntimeError ex) {
+        if (ex.httpStatus() == null) {
+            return fromKnownErrorType(ex.errorType());
+        }
+        HttpStatus resolved = HttpStatus.resolve(ex.httpStatus());
+        return resolved == null ? HttpStatus.INTERNAL_SERVER_ERROR : resolved;
+    }
+
     HttpStatus fromKnownErrorType(KnownRuntimeError.ErrorType errorType) {
         switch (errorType) {
             case NOT_FOUND:
                 return HttpStatus.NOT_FOUND;
+            case FORBIDDEN:
+                return HttpStatus.FORBIDDEN;
             case BAD_REQUEST:
                 return HttpStatus.BAD_REQUEST;
             default:

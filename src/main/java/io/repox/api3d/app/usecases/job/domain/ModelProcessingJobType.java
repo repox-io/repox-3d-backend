@@ -12,7 +12,8 @@ public enum ModelProcessingJobType {
     SPLAT_CONVERT(true),
     USDZ_COMPRESS(true),
     MODEL_THUMBNAIL(true),
-    MODEL_DETAILS(false);
+    MODEL_DETAILS(false),
+    MODEL_INFO(false);
 
     private final boolean producesOutput;
 
